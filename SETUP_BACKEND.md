@@ -30,10 +30,10 @@ pip --version
 cd path/to/your/projects
 
 # Clone the repository
-git clone https://github.com/yourusername/SariSariStoreBackend.git
+git clone https://github.com/yourusername/SariSariStore.git
 
 # Enter the project directory
-cd SariSariStoreBackend
+cd SariSariStore
 ```
 
 ### 2. Create a Virtual Environment

@@ -26,7 +26,7 @@ A web-based e-commerce platform built with **Django** (backend) for managing a s
 ## 📁 Project Structure
 
 ```
-SariSariStoreBackend/
+SariSariStore/
 ├── api/                          # Main application
 │   ├── models.py                 # Database models (UserProfile, Product, Sale, CartItem)
 │   ├── views.py                  # View logic (authentication, dashboards, cart)

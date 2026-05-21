@@ -47,7 +47,7 @@ The frontend is served by the Django backend. To run it:
 
 ```bash
 # Make sure you're in the project directory
-cd SariSariStoreBackend
+cd SariSariStore
 
 # Activate virtual environment
 # Windows: venv\Scripts\activate
@@ -83,7 +83,7 @@ If you want to build a modern React frontend, follow these steps:
 ### 1. Create React App
 
 ```bash
-# Navigate to your projects folder (outside SariSariStoreBackend)
+# Navigate to your projects folder (outside SariSariStore)
 cd path/to/your/projects
 
 # Create React app
@@ -323,7 +323,7 @@ To run both simultaneously:
 
 ### Terminal 1 - Backend
 ```bash
-cd SariSariStoreBackend
+cd SariSariStore
 source venv/bin/activate  # or venv\Scripts\activate on Windows
 python manage.py runserver
 # Backend runs at http://localhost:8000
