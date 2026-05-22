@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sari-Sari Store Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-accent: #4f46e5; /* Indigo Modern Feel */
+            --success-accent: #10b981; /* Emerald Green */
+            --warning-accent: #f59e0b; /* Amber Amber */
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Premium Minimalist Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important;
+            padding: 16px 0;
+            border-bottom: 4px solid var(--primary-accent);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Card Layout Refinement */
+        .card { 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+            margin-bottom: 24px; 
+            background-color: var(--card-bg);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+        .card-header { 
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid #f1f5f9; 
+            font-weight: 600; 
+            font-size: 1rem;
+            color: var(--text-main); 
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form styling adjustments */
+        .form-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-control, .form-select {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Beautiful Modern Table Styles */
+        .table { 
+            vertical-align: middle; 
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background-color: #f9fafb;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .table tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.95rem;
+        }
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Styled Pill Badges */
+        .badge {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+        .badge-low-stock {
+            background-color: #fef2f2 !important;
+            color: #ef4444 !important;
+            border: 1px solid #fee2e2;
+        }
+        .badge-good-stock {
+            background-color: #f0fdf4 !important;
+            color: #15803d !important;
+            border: 1px solid #dcfce7;
+        }
+
+        /* Custom Buttons */
+        .btn {
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .btn-indigo { background-color: var(--primary-accent); color: white; }
+        .btn-indigo:hover { background-color: #4338ca; color: white; }
+        .btn-emerald { background-color: var(--success-accent); color: white; }
+        .btn-emerald:hover { background-color: #059669; color: white; }
+        .btn-amber { background-color: var(--warning-accent); color: white; }
+        .btn-amber:hover { background-color: #d97706; color: white; }
+
+        /* Floating Response Alert Box */
+        .sticky-alert {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            min-width: 320px;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shop-window text-warning"></i> 
+                <span>Sari-Sari Store Management Hub</span>
+            </a>
+            <span class="navbar-text text-white-50 d-none d-sm-inline">
+                <i class="bi bi-person-badge-fill me-1"></i> Admin Portal
+            </span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="alertBox" class="alert d-none sticky-alert animate__animated animate__fadeInDown" role="alert"></div>
+
+        <div class="row">
+            <div class="col-lg-5">
+                
+                <div class="card" style="border-top: 4px solid var(--success-accent);">
+                    <div class="card-header">
+                        <i class="bi bi-cart-plus-fill text-success fs-5"></i>
+                        <span>Record New Transaction</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="saleForm">
+                            <div class="mb-3">
+                                <label class="form-label">Select Customer</label>
+                                <select id="saleCustomer" class="form-select" required>
+                                    <option value="">-- Choose Debtor --</option>
+                                    {% for c in customers %}
+                                        <option value="{{ c.id }}">👤 {{ c.name }} (Bal: ₱{{ c.utang_balance }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Select Product Item</label>
+                                <select id="saleProduct" class="form-select" required>
+                                    <option value="">-- Choose Product --</option>
+                                    {% for p in products %}
+                                        <option value="{{ p.id }}">📦 {{ p.name }} — ₱{{ p.price }} (Stock: {{ p.stock }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Quantity Purchased</label>
+                                <input type="number" id="saleQuantity" class="form-control" min="1" value="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-emerald w-100">
+                                <i class="bi bi-check-circle-fill me-2"></i>Complete Sale & Charge Credit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--primary-accent);">
+                    <div class="card-header">
+                        <i class="bi bi-person-plus-fill text-primary fs-5"></i>
+                        <span>Register New Customer</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="customerForm">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="custName" class="form-control" placeholder="e.g. Aling Nena" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Contact Number (Optional)</label>
+                                <input type="text" id="custContact" class="form-control" placeholder="e.g. 09123456789">
+                            </div>
+                            <button type="submit" class="btn btn-indigo w-100">
+                                <i class="bi bi-person-check-fill me-2"></i>Register Customer Profile
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--warning-accent);">
+                    <div class="card-header">
+                        <i class="bi bi-box-seam-fill text-warning fs-5"></i>
+                        <span>Stock New Product Profile</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="productForm">
+                            <div class="mb-3">
+                                <label class="form-label">Item Name</label>
+                                <input type="text" id="prodName" class="form-control" placeholder="e.g. Coca-Cola" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Unit Price (₱)</label>
+                                <input type="number" id="prodPrice" step="0.01" class="form-control" placeholder="0.00" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Initial Stock Level</label>
+                                <input type="number" id="prodStock" class="form-control" placeholder="0" required>
+                            </div>
+                            <button type="submit" class="btn btn-amber w-100">
+                                <i class="bi bi-plus-circle-fill me-2"></i>Save Product Item
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-7">
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-credit-card-2-back-fill text-danger fs-5"></i>
+                        <span>Credit Balance Ledger (Utang Balance Tracking)</span>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Contact Info</th>
+                                    <th class="text-end">Outstanding Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in customers %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-person text-secondary"></i>
+                                            </div>
+                                            <span class="fw-semibold text-dark">{{ c.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="text-muted">{{ c.contact_number|default:"—" }}</span></td>
+                                    <td class="text-end text-danger fw-bold fs-6">₱{{ c.utang_balance }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted p-4"><i class="bi bi-inbox me-2"></i>No registered customers found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-layers-half text-info fs-5"></i>
+                        <span>Current Product Inventory</span>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th>Unit Price</th>
+                                    <th class="text-center">Available Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in products %}
+                                <tr>
+                                    <td class="fw-semibold text-dark">{{ p.name }}</td>
+                                    <td class="text-dark">₱{{ p.price }}</td>
+                                    <td class="text-center">
+                                        {% if p.stock <= 5 %}
+                                            <span class="badge badge-low-stock">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Critical: {{ p.stock }} left
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-good-stock">
+                                                <i class="bi bi-check-all me-1"></i>{{ p.stock }} units
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted p-4"><i class="bi bi-inbox me-2"></i>Your store catalog is empty.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System message utility banner controller
+        function displayAlert(message, isSuccessful) {
+            const alertElement = document.getElementById('alertBox');
+            alertElement.className = `alert ${isSuccessful ? 'alert-success' : 'alert-danger'} sticky-alert text-center fw-semibold shadow-lg`;
+            alertElement.innerHTML = isSuccessful 
+                ? `<i class="bi bi-check-circle-fill me-2"></i>${message}` 
+                : `<i class="bi bi-exclamation-octagon-fill me-2"></i>${message}`;
+            alertElement.classList.remove('d-none');
+            
+            // Auto hide alert after 4 seconds
+            setTimeout(() => {
+                alertElement.classList.add('d-none');
+            }, 4000);
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Action 1: Handle Asynchronous Customer Form Submission
+        document.getElementById('customerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const rawPayload = {
+                name: document.getElementById('custName').value,
+                contact_number: document.getElementById('custContact').value
+            };
+            try {
+                const endpointResponse = await fetch('/api/customers/add/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(rawPayload)
+                });
+                const cleanData = await endpointResponse.json();
+                if (endpointResponse.ok) { 
+                    location.reload(); 
+                } else { 
+                    displayAlert(cleanData.message, false); 
+                }
+            } catch (err) {
+                displayAlert("Network connection failed to connect with Django views API.", false);
+            }
+        });
+
+        // Action 2: Handle Asynchronous Product Form Submission (Blocks Negative Price Bug)
+        document.getElementById('productForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const rawPayload = {
+                name: document.getElementById('prodName').value,
+                price: document.getElementById('prodPrice').value,
+                stock: document.getElementById('prodStock').value
+            };
+            try {
+                const endpointResponse = await fetch('/api/products/add/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(rawPayload)
+                });
+                const cleanData = await endpointResponse.json();
+                if (endpointResponse.ok) { 
+                    location.reload(); 
+                } else { 
+                    displayAlert(cleanData.message, false); 
+                }
+            } catch (err) {
+                displayAlert(cleanData.message || "Network connection failed to connect with Django views API.", false);
+            }
+        });
+
+        // Action 3: Handle Asynchronous Sale Form Processing
+        document.getElementById('saleForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const rawPayload = {
+                customer_id: document.getElementById('saleCustomer').value,
+                product_id: document.getElementById('saleProduct').value,
+                quantity: document.getElementById('saleQuantity').value
+            };
+            try {
+                const endpointResponse = await fetch('/api/sales/add/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(rawPayload)
+                });
+                const cleanData = await endpointResponse.json();
+                if (endpointResponse.ok) { 
+                    location.reload(); 
+                } else { 
+                    displayAlert(cleanData.message, false); 
+                }
+            } catch (err) {
+                displayAlert("Network connection failed to connect with Django views API.", false);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -115,9 +115,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
 STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- AUTHENTICATION ROUTING SETTINGS ---
+# Tells Django where to send users who aren't logged in
+LOGIN_URL = 'login'
+
+# Tells Django where to take users immediately after a successful login fallback
+LOGIN_REDIRECT_URL = 'dashboard'
+
+
+# --- MEDIA STORAGE CONFIGURATION ---
+import os
+
+# Web URL path prefix for accessing images in the browser
+MEDIA_URL = '/media/'
+
+# Physical local directory path where image files will save on your computer
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

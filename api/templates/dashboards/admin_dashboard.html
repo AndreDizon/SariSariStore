@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sari-Sari Hub - Admin Control Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { 
+            /* Smooth, dark-to-light professional gray gradient */
+            background-color: #f4f6f9;
+            background-image: 
+                /* Layer 1: Subtle CSS Grid Pattern */
+                linear-gradient(rgba(33, 37, 41, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(33, 37, 41, 0.03) 1px, transparent 1px),
+                /* Layer 2: Soft Linear Gradient */
+                linear-gradient(180deg, #edf1f7 0%, #f4f6f9 100%);
+                
+            /* Defines the sizing for the grid pattern */
+            background-size: 24px 24px, 24px 24px, 100% 100%;
+            
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+        }
+
+        /* Fixes grid pattern bleeding into header bar */
+        header.sticky-header {
+            background-color: #212529 !important; /* Solid dark background matches your original look */
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Fixes grid pattern bleeding into footer bar */
+        footer {
+            background-color: #212529 !important; /* Makes footer completely solid dark background */
+            position: relative;
+            z-index: 10;
+            margin-top: auto; /* Pushes footer neatly down to screen bottom edge */
+        }
+
+        .avatar-circle {
+            width: 35px;
+            height: 35px;
+            background-color: #ffc107;
+            color: #212529;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .product-thumbnail {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            border-radius: 6px;
+            background-color: #fff;
+            border: 1px solid #e3e6f0;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="sticky-header text-white py-3 mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="{% url 'dashboard' %}" class="navbar-brand d-flex align-items-center gap-2 m-0 text-white text-decoration-none">
+                <i class="bi bi-shield-lock text-warning fs-3"></i>
+                <span class="fs-4 fw-bold tracking-tight">{{ profile.store_name|default:request.user.username }} <span class="text-warning">Console</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-none d-md-flex flex-column text-end">
+                    <span class="small opacity-75">Merchant: <strong>{{ request.user.username }}</strong></span>
+                    <small class="text-warning" style="font-size: 0.75rem;"><i class="bi bi-wallet2 me-1"></i>GCash: {{ profile.gcash_number|default:"Not Linked" }}</small>
+                </div>
+                <div class="avatar-circle">{{ request.user.username|slice:":1" }}</div>
+                <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-warning px-3 rounded-pill fw-semibold"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card side-card shadow-sm p-4 mb-4 bg-white border-0 rounded-3">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-plus-box text-warning me-2"></i>Provision Stock</h5>
+                    <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary">Product Name</label>
+                            <input type="text" name="name" class="form-control bg-light border-0" required placeholder="e.g., Piattos Cheese Large">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-secondary">Retail Price (₱)</label>
+                                <input type="number" step="0.01" name="price" class="form-control bg-light border-0" required placeholder="0.00">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-secondary">Initial Count</label>
+                                <input type="number" name="stock" class="form-control bg-light border-0" required placeholder="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-secondary"><i class="bi bi-link-45deg me-1"></i>Image Web URL</label>
+                            <input type="url" name="image_url" class="form-control bg-light border-0 form-control-sm" placeholder="https://example.com/item.jpg">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-secondary"><i class="bi bi-image me-1"></i>Or Upload Local File (PNG/JPG)</label>
+                            <input type="file" name="image_file" accept="image/*" class="form-control bg-light border-0 form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 rounded-3 shadow-sm">Commit to Inventory</button>
+                    </form>
+                </div>
+                
+                <div class="card side-card shadow-sm p-4 bg-white border-0 rounded-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-journal-bookmark text-primary me-2"></i>Credit Ledger</h5>
+                        <i class="bi bi-person-lines-fill text-muted"></i>
+                    </div>
+                    <p class="text-muted small mb-3">Track dynamic debts owed specifically to your shop profile layout.</p>
+                    <form method="GET" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="ledger_search" value="{{ ledger_search }}" class="form-control bg-light border-0 form-control-sm" placeholder="Find debtor username...">
+                            <button type="submit" class="btn btn-dark btn-sm fw-bold px-3"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+                    <div class="table-responsive" style="max-height: 40vh; overflow-y: auto;">
+                        <table class="table table-sm align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr class="text-secondary border-bottom">
+                                    <th>Customer</th>
+                                    <th class="text-end">Balance Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ledger in customer_ledgers %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold text-dark d-block">{{ ledger.username }}</span>
+                                        <small class="text-muted">{{ ledger.phone_number }}</small>
+                                    </td>
+                                    <td class="text-end fw-bold {% if ledger.outstanding_debt > 0 %}text-danger{% else %}text-muted{% endif %}">
+                                        ₱{{ ledger.outstanding_debt }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted py-3">No matching customer records.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-layers text-warning me-2"></i>Active Product Stock Levels</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 text-center">
+                            <thead class="table-light text-secondary small fw-bold">
+                                <tr>
+                                    <th class="text-start" colspan="2">Product Details</th>
+                                    <th>Retail Unit Cost</th>
+                                    <th>Available Stock Balance</th>
+                                    <th>Status Advisory</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="small">
+                                {% for product in products %}
+                                <tr>
+                                    <td style="width: 50px;">
+                                        {% if product.image_file %}
+                                            <img src="{{ product.image_file.url }}" class="product-thumbnail" alt="">
+                                        {% elif product.image_url %}
+                                            <img src="{{ product.image_url }}" class="product-thumbnail" alt="">
+                                        {% else %}
+                                            <div class="product-thumbnail d-flex align-items-center justify-content-center text-secondary"><i class="bi bi-box"></i></div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-start fw-bold text-dark">{{ product.name }}</td>
+                                    <td class="fw-semibold text-success">₱{{ product.price }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2 py-1">{{ product.stock }} units available</span>
+                                    </td>
+                                    <td>
+                                        {% if product.stock > 5 %}
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2">● Stable Stock</span>
+                                        {% elif product.stock > 0 %}
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2">● Low Stock</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2">● Out of Stock</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{% url 'delete_product' product.id %}" onsubmit="return confirm('Are you sure you want to completely remove {{ product.name }} from your shop?');" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-link link-danger p-0 border-0" title="Delete Product">
+                                                <i class="bi bi-trash3-fill fs-5 text-danger"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-muted py-4">
+                                        <i class="bi bi-box-seam d-block fs-2 mb-2 text-secondary opacity-50"></i>
+                                        No product profiles found inside store catalogs.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card main-card shadow-sm border-0 rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-receipt text-secondary me-2"></i>Incoming Orders & Logistics Tracker</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0" style="font-size: 0.9rem;">
+                            <thead class="table-light text-secondary">
+                                <tr>
+                                    <th>Buyer User</th>
+                                    <th>Order Particulars</th>
+                                    <th>Total Charged</th>
+                                    <th>Remittance & Settlement</th>
+                                    <th>Logistics Delivery Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in sales_records %}
+                                <tr class="border-start border-4 {% if sale.status == 'paid' %}border-success{% else %}border-danger{% endif %}">
+                                    <td><strong class="text-dark">{{ sale.customer.username }}</strong></td>
+                                    <td>{{ sale.product.name }} <span class="text-muted small">×{{ sale.quantity }}</span></td>
+                                    <td class="fw-bold text-dark">₱{{ sale.total_amount }}</td>
+                                    <td>
+                                        <div class="mb-1">
+                                            {% if sale.customer_payment_status == 'sent' %}
+                                            <span class="badge bg-info text-white"><i class="bi bi-phone-vibrate me-1"></i>Remittance Sent</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary">⏳ Unreported Payout</span>
+                                            {% endif %}
+                                        </div>
+                                        <form method="POST" action="{% url 'toggle_admin_payment' sale.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn {% if sale.status == 'unpaid' %}btn-outline-danger{% else %}btn-success{% endif %} btn-sm fw-bold py-0 px-2" style="font-size: 0.75rem;">
+                                                {% if sale.status == 'unpaid' %}Mark Paid Off{% else %}✓ Paid Slipped{% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{% url 'toggle_admin_delivery' sale.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm w-100 fw-bold {% if sale.delivery_status == 'pending' %}btn-warning text-dark{% else %}btn-outline-success{% endif %}" style="font-size: 0.8rem; padding: 3px 8px;">
+                                                {% if sale.delivery_status == 'pending' %}📦 Dispatch Order{% else %}✅ Delivered{% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-muted text-center py-4">No active transactional orders to manage.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 border-top border-secondary">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="fw-bold text-white"><i class="bi bi-shield-lock text-warning me-2"></i>{{ profile.store_name|default:request.user.username }} Admin Operations</span>
+                    <p class="text-muted small mb-0 mt-1">Authorized digital bookkeeping node on the Sari-Sari Hub network.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <span class="text-muted small">&copy; 2026 Sari-Sari Hub Enterprise. All Rights Reserved.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
